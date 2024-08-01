@@ -7,6 +7,8 @@
   </p>
 </p>
 
+## What is?
+
 Heyday Money is a personal finance tracking and simulator with a simple goal: to turn every penny into its heyday
 
 ## Philosophy of Money and Finance
