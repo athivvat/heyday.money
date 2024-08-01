@@ -1,7 +1,10 @@
-<p align="center">
-<h1 align="center">Heyday Money</h1>
-
-<p align="center" style="center;font-size:18px;">Money sucked for years. Not anymore — we fixed it and made it grow.</p>
+<p>
+  <h1 align="center">Heyday Money</h1>
+  <p align="center">
+    Money sucked for years. Not anymore — we fixed it and made it grow.
+    <br />
+    <a href="https://heyday.money"><strong>Learn more »</strong></a>
+  </p>
 </p>
 
 Heyday Money is a personal finance tracking and simulator with a simple goal: to turn every penny into its heyday
