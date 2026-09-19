@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output and caches
+dist/
+.tanstack/
+.output/
+.vite/
+*.tsbuildinfo
+
+# Local environment variables (keep example templates)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Test artifacts
+test-results/
+playwright-report/
+blob-report/
+coverage/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
