@@ -8,11 +8,11 @@ With Google Chrome installed and the development server running, `bunx playwrigh
 
 The page uses TanStack Start, React, Tailwind CSS v4, and Bun. Framework setup follows the [TanStack Start documentation](https://tanstack.com/start/latest/docs/framework/react/build-from-scratch).
 
-Layout, responsive rules, typography, colors, and component styling use Tailwind utilities in `src/routes/index.tsx`. `src/styles.css` contains the Tailwind theme tokens, base defaults, and animation keyframes/motion paths. The `dark:` variant follows `data-theme`; the `short:` variant adjusts layouts below 740px viewport height. Shared feature cards use the `FeatureNote` component.
+Layout, responsive rules, typography, colors, and component styling use Tailwind utilities in `src/components/Landing.tsx`. `src/styles.css` contains the Tailwind theme tokens, base defaults, and animation keyframes/motion paths. The `dark:` variant follows `data-theme`; the `short:` variant adjusts layouts below 740px viewport height. Shared feature cards use the `FeatureNote` component.
 
 The day/night switch follows the system preference until the visitor chooses a mode, then saves that choice locally. Animations respect reduced-motion preferences.
 
-The macOS and Windows buttons currently show a coming-soon notification. Replace the button handlers in `src/routes/index.tsx` with the actual installer destinations when releases are ready.
+The macOS button fetches the newest published release, including prereleases, from `https://api.github.com/repos/heyday-money/heyday/releases?per_page=1` when clicked and downloads its DMG (preferring a universal installer). If separate architecture installers are available, no DMG is present, or the request fails or exceeds 10 seconds, it opens the releases page. Windows still shows a coming-soon notification. No GitHub token is required; the repository and releases must be public for the API lookup to succeed.
 
 ## Vercel deployment
 
@@ -21,3 +21,11 @@ The Nitro Vite plugin is configured between TanStack Start and React, following 
 Import this repository into Vercel and select the directory containing `package.json` as the project root. Use `bun install --frozen-lockfile` for installation and `bun run build` for the build command. Leave the output directory at the framework default; do not override it to `dist`.
 
 To verify Vercel output locally without deploying, run `NITRO_PRESET=vercel bun run build`. This generates `.vercel/output/` with static assets and the server function. A normal local `bun run build` generates `.output/` for `bun run preview`.
+
+## Languages
+
+English is served at `/` (no `/en` prefix), and Thai at `/th`. The EN/TH links in the footer switch routes; the chosen language stays in the URL on reload and can be shared. Page copy is in `src/i18n.ts`, with localized titles, descriptions, accessibility labels, and document language. Both routes use `src/components/Landing.tsx`.
+
+## House windows
+
+`HouseWindows.tsx` overlays three registered window regions on the original island. The lit sashes slide up for open, unlit daytime windows and down at night; reduced-motion settings make the change immediate. The generated daytime layer is in `public/images/island-day-windows.png`; only its window regions are rendered, preserving the original island and transparency. Created with the built-in imagegen tool using this prompt: “Preserve the original 1536×1024 island and window alignment. Change only the three windows to open vertical sash windows with raised lower sashes, pale blue upper glass, dark unlit interiors, and original wooden frames. No yellow light; preserve all other geometry.”

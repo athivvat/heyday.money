@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant thai (&:where(:lang(th)));
 @custom-variant short (@media (max-height: 740px));
 
 @theme {
-  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+  --font-sans: "Inter", "Thonburi", "Leelawadee UI", Tahoma, sans-serif;
   --color-brand: #8942fe;
   --color-accent: #fed728;
   --animate-float: float 7s ease-in-out infinite;
@@ -44,10 +45,16 @@
     color-scheme: dark;
   }
   body { @apply bg-page font-sans text-ink; }
+  :is(h1, h2, h3):lang(th) { font-family: "Noto Sans Thai", var(--font-sans); }
   button { @apply cursor-pointer disabled:cursor-wait; }
   button, a { -webkit-tap-highlight-color: transparent; }
   button:focus-visible, a:focus-visible { @apply outline-3 outline-offset-5 outline-brand; }
 }
+
+/* Raise the lit sash for open, unlit daytime windows; lower it at night. */
+.house-windows { --window-open: 1; }
+[data-theme="dark"] .house-windows { --window-open: 0; }
+.house-window-sash { transition: translate 950ms cubic-bezier(.4, 0, .2, 1); }
 
 /* Motion paths stay in CSS; all layout and visual styling lives in Tailwind utilities. */
 .celestial-body {
