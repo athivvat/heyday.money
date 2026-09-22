@@ -29,3 +29,9 @@ English is served at `/` (no `/en` prefix), and Thai at `/th`. The EN/TH links i
 ## House windows
 
 `HouseWindows.tsx` overlays three registered window regions on the original island. The lit sashes slide up for open, unlit daytime windows and down at night; reduced-motion settings make the change immediate. The generated daytime layer is in `public/images/island-day-windows.png`; only its window regions are rendered, preserving the original island and transparency. Created with the built-in imagegen tool using this prompt: “Preserve the original 1536×1024 island and window alignment. Change only the three windows to open vertical sash windows with raised lower sashes, pale blue upper glass, dark unlit interiors, and original wooden frames. No yellow light; preserve all other geometry.”
+
+## Social preview
+
+`/api/og` generates a 1200 × 630 PNG using `@vercel/og` and a PNG copy (`src/heyday-money.png`) of the supplied `src/heyday-money.webp`. The PNG conversion is needed by this renderer; the original WebP is preserved. The original card is embedded in the server bundle, so generation needs no external image fetch or font download. Replace the PNG copy to update the preview. On macOS, regenerate it with `sips -s format png src/heyday-money.webp --out src/heyday-money.png`. Responses cache for one hour in browsers and one day on the CDN.
+
+Both `/` and `/th` include server-rendered Open Graph and Twitter large-image tags with localized titles/descriptions, canonical URLs, and the shared preview. The production origin is `https://heyday.money` in `languageHead` in `src/i18n.ts`. Preview the image at `http://127.0.0.1:3000/api/og`. `@vercel/og` is pinned to 0.8.5 because 1.0.2 ships without the required `hb.wasm` asset. Implementation follows [Vercel’s OG image generation guide](https://vercel.com/docs/og-image-generation).

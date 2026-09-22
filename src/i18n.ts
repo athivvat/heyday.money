@@ -75,9 +75,33 @@ export const translations: Record<Language, typeof en> = {
 
 export function languageHead(language: Language) {
   const t = translations[language];
+  const siteUrl = "https://heyday.money";
+  const pageUrl = `${siteUrl}${language === "th" ? "/th" : "/"}`;
+  const imageUrl = `${siteUrl}/api/og`;
   return {
-    meta: [{ title: t.title }, { name: "description", content: t.description }],
+    meta: [
+      { title: t.title },
+      { name: "description", content: t.description },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Heyday.Money" },
+      { property: "og:title", content: t.title },
+      { property: "og:description", content: t.description },
+      { property: "og:url", content: pageUrl },
+      { property: "og:locale", content: language === "th" ? "th_TH" : "en_US" },
+      { property: "og:locale:alternate", content: language === "th" ? "en_US" : "th_TH" },
+      { property: "og:image", content: imageUrl },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: t.islandAlt },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: t.title },
+      { name: "twitter:description", content: t.description },
+      { name: "twitter:image", content: imageUrl },
+      { name: "twitter:image:alt", content: t.islandAlt },
+    ],
     links: [
+      { rel: "canonical", href: pageUrl },
       { rel: "alternate", hrefLang: "en", href: "/" },
       { rel: "alternate", hrefLang: "th", href: "/th" },
       { rel: "alternate", hrefLang: "x-default", href: "/" },
