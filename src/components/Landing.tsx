@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, Check, Moon, RefreshCw, Sun, X } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, Moon, RefreshCw, Sun } from 'lucide-react'
 
 import { translations, type Language } from '../i18n'
 import { HouseWindows } from './HouseWindows'
@@ -8,7 +8,7 @@ import { HouseWindows } from './HouseWindows'
 const releasesUrl = 'https://github.com/heyday-money/heyday/releases'
 const latestReleaseApi = 'https://api.github.com/repos/heyday-money/heyday/releases?per_page=1'
 
-async function getMacDownloadUrl() {
+async function getDownloadUrl(platform: 'macOS' | 'Windows') {
   try {
     const response = await fetch(latestReleaseApi, {
       headers: { Accept: 'application/vnd.github+json' },
@@ -18,6 +18,11 @@ async function getMacDownloadUrl() {
     // The releases list includes published prereleases, unlike /releases/latest.
     const [release] = await response.json() as { assets: { name: string; browser_download_url: string }[] }[]
     if (!release) return releasesUrl
+    if (platform === 'Windows') {
+      const installer = release.assets.find(asset => /_x64-setup\.exe$/i.test(asset.name))
+        ?? release.assets.find(asset => /_x64[^/]*\.msi$/i.test(asset.name))
+      return installer?.browser_download_url ?? releasesUrl
+    }
     const installers = release.assets.filter(asset => /\.dmg$/i.test(asset.name))
     const installer = installers.find(asset => /universal/i.test(asset.name))
       ?? (installers.length === 1 ? installers[0] : undefined)
@@ -60,17 +65,16 @@ function PlatformIcon({ platform }: { platform: 'macOS' | 'Windows' }) {
 export function Landing({ language }: { language: Language }) {
   const t = translations[language]
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
-  const [notice, setNotice] = useState(false)
   const [skyCycle, setSkyCycle] = useState(0)
   const [ready, setReady] = useState(false)
-  const [downloadingMac, setDownloadingMac] = useState(false)
-  const downloadMac = async () => {
-    if (downloadingMac) return
-    setDownloadingMac(true)
+  const [downloading, setDownloading] = useState<'macOS' | 'Windows' | null>(null)
+  const download = async (platform: 'macOS' | 'Windows') => {
+    if (downloading) return
+    setDownloading(platform)
     try {
-      window.location.assign(await getMacDownloadUrl())
+      window.location.assign(await getDownloadUrl(platform))
     } finally {
-      setDownloadingMac(false)
+      setDownloading(null)
     }
   }
   useEffect(() => {
@@ -87,7 +91,6 @@ export function Landing({ language }: { language: Language }) {
     media.addEventListener('change', sync)
     return () => media.removeEventListener('change', sync)
   }, [])
-  useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(false), 6500); return () => clearTimeout(timer) }, [notice])
   const toggleTheme = () => {
     const next = theme === 'light' ? 'dark' : 'light'
     setTheme(next)
@@ -131,12 +134,20 @@ export function Landing({ language }: { language: Language }) {
         <span className="absolute bottom-[19%] left-[13%] text-[26px] text-[#ae93d4] max-sm:bottom-[8%] max-sm:text-xl" aria-hidden="true">✧</span><span className="absolute right-[16%] bottom-[10%] text-[15px] text-[#d5bc50] max-sm:right-[12%] max-sm:bottom-[5%]" aria-hidden="true">✦</span>
       </section>
 
-      <section className="download-area relative z-2 animate-appear px-5 pt-2 pb-2 text-center [animation-delay:200ms]" aria-label={t.downloadLabel}>
+      <section className="download-area relative z-2 animate-appear px-5 pt-2 pb-8 short:pb-5 text-center [animation-delay:200ms]" aria-label={t.downloadLabel}>
         <p className="mb-4 text-[13px] font-[550] max-sm:mb-3 max-sm:text-xs short:mb-2.5">{t.freshStart}</p>
         <div className="flex flex-wrap justify-center gap-3 max-sm:gap-2">
-          {(['macOS', 'Windows'] as const).map(platform => <button className={`flex min-w-48 items-center gap-3 rounded-xl border px-4 py-3 text-left transition duration-250 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 max-sm:min-w-[155px] max-sm:gap-2 max-sm:px-3 short:py-2 [&>svg:first-child]:size-[27px] ${platform === 'macOS' ? 'border-transparent bg-brand text-white shadow-brand/10 shadow-md' : 'border-line bg-card text-ink'}`} key={platform} disabled={!ready || (platform === 'macOS' && downloadingMac)} aria-busy={platform === 'macOS' && downloadingMac} onClick={() => platform === 'macOS' ? void downloadMac() : setNotice(true)} aria-describedby="download-note"><PlatformIcon platform={platform} /><span><small className="block text-[9px] leading-[1.4] opacity-75">{platform === 'macOS' && downloadingMac ? t.preparing : t.downloadFor}</small><strong className="block text-base leading-[1.4] font-semibold max-sm:text-sm">{platform}</strong></span><ArrowUpRight className="ml-auto opacity-65 max-sm:size-3.5" size={18} /></button>)}
+          {(['macOS', 'Windows'] as const).map(platform => <button className={`flex min-w-48 items-center gap-3 rounded-xl border px-4 py-3 text-left transition duration-250 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 max-sm:min-w-[155px] max-sm:gap-2 max-sm:px-3 short:py-2 [&>svg:first-child]:size-[27px] ${platform === 'macOS' ? 'border-transparent bg-brand text-white shadow-brand/10 shadow-md' : 'border-line bg-card text-ink'}`} key={platform} disabled={!ready || downloading !== null} aria-busy={downloading === platform} onClick={() => void download(platform)} aria-describedby="download-note"><PlatformIcon platform={platform} /><span><small className="block text-[9px] leading-[1.4] opacity-75">{downloading === platform ? t.preparing : t.downloadFor}</small><strong className="block text-base leading-[1.4] font-semibold max-sm:text-sm">{platform}</strong></span><ArrowUpRight className="ml-auto opacity-65 max-sm:size-3.5" size={18} /></button>)}
         </div>
         <p id="download-note" className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-muted short:mt-2"><span className="size-[5px] rounded-full bg-[#a5ad97]" /> {t.downloadNote}</p>
+        <nav className="mt-6 flex items-center justify-center gap-3 short:mt-4" aria-label={language === 'th' ? 'โซเชียลมีเดีย' : 'Social media'}>
+          <a href="https://www.facebook.com/HeyDay.Money.Club" target="_blank" rel="noopener noreferrer" aria-label="Heyday Money on Facebook" title="Facebook" className="grid size-10 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
+            <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.026 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.931-1.956 1.887v2.264h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073Z" /></svg>
+          </a>
+          <a href="https://www.tiktok.com/@heyday.money.club" target="_blank" rel="noopener noreferrer" aria-label="Heyday Money on TikTok" title="TikTok" className="grid size-10 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
+            <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.321 5.562a5.124 5.124 0 0 1-3.115-4.43V1h-3.677v14.59a3.08 3.08 0 0 1-3.073 2.946 3.08 3.08 0 0 1-3.08-3.08 3.08 3.08 0 0 1 3.08-3.08c.304 0 .596.046.872.128V8.77a6.792 6.792 0 0 0-.872-.056 6.744 6.744 0 0 0-6.744 6.744A6.744 6.744 0 0 0 9.456 22.2a6.744 6.744 0 0 0 6.744-6.744V8.01a8.79 8.79 0 0 0 5.14 1.65V5.986a5.12 5.12 0 0 1-2.019-.424Z" /></svg>
+          </a>
+        </nav>
       </section>
     </main>
 
@@ -150,6 +161,5 @@ export function Landing({ language }: { language: Language }) {
         </nav>
       </div>
     </footer>
-    <div className={`fixed bottom-6 left-1/2 z-10 flex w-max max-w-[calc(100%-32px)] -translate-x-1/2 items-center gap-3 rounded-xl bg-ink p-4 text-[13px] text-page shadow-xl transition duration-200 ${notice ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none translate-y-6 opacity-0'}`} role="status" aria-live="polite">{notice && <><Check size={19} className="shrink-0 text-[#b6d8a1]" /><span>{t.windowsNotice}</span><button className="grid place-items-center p-1" onClick={() => setNotice(false)} aria-label={t.dismiss}><X size={18} /></button></>}</div>
   </div>
 }

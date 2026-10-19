@@ -26,9 +26,7 @@ const en = {
   freshStart: "A fresh start for your finances.",
   downloadFor: "Download for",
   preparing: "Preparing download…",
-  downloadNote: "macOS public alpha · Windows coming soon",
-  windowsNotice:
-    "Heyday for Windows is coming soon. Your fresh start is on its way.",
+  downloadNote: "macOS & Windows public beta",
   footer: "Don’t let money control you.",
   footerAccent: "Play your game.",
   definition: "Your Prime, Defined.",
@@ -63,9 +61,7 @@ export const translations: Record<Language, typeof en> = {
     freshStart: "เริ่มต้นใหม่กับการเงินของคุณ",
     downloadFor: "ดาวน์โหลดสำหรับ",
     preparing: "กำลังเตรียมดาวน์โหลด…",
-    downloadNote: "macOS เปิดให้ทดลองเวอร์ชันอัลฟา · Windows เร็ว ๆ นี้",
-    windowsNotice:
-      "Heyday สำหรับ Windows กำลังจะมา พร้อมให้คุณเริ่มต้นใหม่เร็ว ๆ นี้",
+    downloadNote: "macOS และ Windows เปิดให้ทดลองเวอร์ชันเบตา",
     footer: "Don’t let money control you.",
     footerAccent: "Play your game.",
     definition: "Your Prime, Defined.",
