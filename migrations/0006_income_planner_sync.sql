@@ -1,0 +1,3 @@
+-- Income forecast overrides require protocol 4 clients. Financial values remain ciphertext.
+ALTER TABLE cloud_sync_state DROP CONSTRAINT cloud_sync_state_protocol_check;
+ALTER TABLE cloud_sync_state ADD CONSTRAINT cloud_sync_state_protocol_check CHECK(protocol IN (1,2,3,4));

@@ -1,9 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, Moon, RefreshCw, Sun } from 'lucide-react'
+import { ArrowDown, ArrowDownLeft, ArrowUpRight, Moon, RefreshCw, Sun } from 'lucide-react'
 
 import { translations, type Language } from '../i18n'
 import { HouseWindows } from './HouseWindows'
+import { FeatureComparison } from './FeatureComparison'
+import { useLandingMotion } from '../hooks/useLandingMotion'
 
 const releasesUrl = 'https://github.com/heyday-money/heyday/releases'
 const latestReleaseApi = 'https://api.github.com/repos/heyday-money/heyday/releases?per_page=1'
@@ -64,6 +66,7 @@ function PlatformIcon({ platform }: { platform: 'macOS' | 'Windows' }) {
 
 export function Landing({ language }: { language: Language }) {
   const t = translations[language]
+  const motionRef = useLandingMotion(language)
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [skyCycle, setSkyCycle] = useState(0)
   const [ready, setReady] = useState(false)
@@ -99,24 +102,27 @@ export function Landing({ language }: { language: Language }) {
     try { localStorage.setItem('heyday-theme', next) } catch { /* Theme still works without persistence. */ }
   }
 
-  return <div className="page-shell relative grid h-svh min-h-[600px] grid-rows-[80px_minmax(0,1fr)_80px] overflow-hidden bg-page text-ink transition-colors duration-700 max-sm:min-h-[640px] max-sm:grid-rows-[68px_minmax(0,1fr)_68px]">
+  return <div ref={motionRef} className="page-shell relative min-h-svh overflow-x-clip bg-page text-ink transition-colors duration-700">
     <a className="absolute -top-16 left-5 z-20 rounded bg-ink p-2.5 text-page focus:top-2.5" href="#main">{t.skip}</a>
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true"><div className="absolute top-1/2 left-1/2 h-[710px] w-[1100px] -translate-1/2 bg-[radial-gradient(ellipse,#e9ecd995_0%,#eff0e54a_38%,transparent_69%)] dark:bg-[radial-gradient(ellipse,#8942fe24_0%,#65509310_48%,transparent_70%)]" />{Array.from({ length: 22 }, (_, i) => <i className="absolute size-0.5 rounded-full bg-white opacity-0 transition-opacity duration-1000 dark:animate-twinkle dark:opacity-35" key={i} style={{ left: `${(i * 43 + 7) % 100}%`, top: `${(i * 23 + 5) % 87}%`, animationDelay: `${i % 5}s` }} />)}</div>
-    <header className="relative z-2 flex h-full items-center justify-between px-[4.4%] max-sm:px-4">
+    <div className="pointer-events-none absolute inset-x-0 top-0 h-svh min-h-[600px] overflow-hidden max-sm:min-h-[640px]" aria-hidden="true"><div className="absolute top-1/2 left-1/2 h-[710px] w-[1100px] -translate-1/2 bg-[radial-gradient(ellipse,#e9ecd995_0%,#eff0e54a_38%,transparent_69%)] dark:bg-[radial-gradient(ellipse,#8942fe24_0%,#65509310_48%,transparent_70%)]" />{Array.from({ length: 22 }, (_, i) => <i className="absolute size-0.5 rounded-full bg-white opacity-0 transition-opacity duration-1000 dark:animate-twinkle dark:opacity-35" key={i} style={{ left: `${(i * 43 + 7) % 100}%`, top: `${(i * 23 + 5) % 87}%`, animationDelay: `${i % 5}s` }} />)}</div>
+    <header className="relative z-2 flex h-20 items-center justify-between px-[4.4%] max-sm:h-[68px] max-sm:px-4">
       <Logo />
       <div className="flex items-center gap-3 max-sm:gap-2"><span className="text-[11px] tracking-[.2px] text-muted max-lg:hidden">{t.perspective}</span>
+        <Link to="/account" className="rounded-full border border-line px-3 py-2 text-xs font-medium">{language === 'th' ? 'บัญชี' : 'Account'}</Link>
         <button className="relative flex h-[39px] w-[78px] items-center justify-between gap-4 rounded-full border border-line bg-[#eaece5] px-2.5 dark:bg-[#16191d]" disabled={!ready} onClick={toggleTheme} aria-label={t.nightMode} role="switch" aria-checked={theme === 'dark'}><span className="absolute top-1 left-1 size-[29px] rounded-full bg-white shadow-sm transition-all duration-400 dark:translate-x-[38px] dark:bg-brand" /><Sun size={17} className="z-1 shrink-0 text-[#756534]" /><Moon size={17} className="z-1 shrink-0 text-[#888e88] dark:text-white" /></button></div>
     </header>
 
-    <main id="main" className="main-content relative mx-auto grid h-full max-h-[850px] min-h-0 w-full self-center grid-rows-[auto_minmax(0,1fr)_auto]">
-      <section className="relative z-1 flex animate-appear flex-col items-center px-6 pt-2 text-center max-sm:px-5" aria-labelledby="headline">
-        <div className="mb-4 inline-flex items-center gap-2 text-[10px] font-semibold tracking-[2px] thai:tracking-normal thai:text-xs max-sm:thai:text-[10px] text-muted max-sm:mb-3 max-sm:text-[8px] max-sm:tracking-[1.4px] short:mb-2.5"><span className="size-1.5 rounded-full bg-brand" /> {t.kicker}</div>
-        <h1 id="headline" className="thai:tracking-normal thai:leading-[1.35] thai:text-[clamp(30px,4vw,56px)] max-sm:thai:text-[clamp(28px,8vw,36px)] short:thai:text-[36px] max-sm:short:thai:text-[30px] relative inline-block text-[clamp(40px,4.5vw,67px)] leading-[1.1] font-[650] tracking-[-3.6px] max-lg:text-[49px] max-lg:tracking-[-2.8px] max-sm:text-[clamp(39px,10.6vw,56px)] max-sm:leading-[1.13] max-sm:tracking-[-2.3px] short:text-5xl max-sm:short:text-4xl">{t.headline}<br className="hidden max-sm:block" /> <span className="relative inline-block text-brand dark:text-[#b58bff]">{t.headlineAccent}
+    <main id="main">
+    <div className="hero-layout flex h-[calc(100svh-160px)] min-h-[440px] items-center max-sm:h-[calc(100svh-136px)] max-sm:min-h-[504px]">
+    <div className="main-content relative mx-auto grid h-full max-h-[850px] min-h-0 w-full grid-rows-[auto_minmax(0,1fr)_auto]">
+      <section data-hero-copy className="hero-copy relative z-1 flex flex-col items-center px-6 pt-2 text-center max-sm:px-5" aria-labelledby="headline">
+        <div className="mb-4 inline-flex animate-appear items-center gap-2 text-[10px] font-semibold tracking-[2px] thai:tracking-normal thai:text-xs max-sm:thai:text-[10px] text-muted max-sm:mb-3 max-sm:text-[8px] max-sm:tracking-[1.4px] short:mb-2.5"><span className="size-1.5 rounded-full bg-brand" /> {t.kicker}</div>
+        <h1 id="headline" className="animate-appear [animation-delay:80ms] thai:tracking-normal thai:leading-[1.35] thai:text-[clamp(30px,4vw,56px)] max-sm:thai:text-[clamp(28px,8vw,36px)] short:thai:text-[36px] max-sm:short:thai:text-[30px] relative inline-block text-[clamp(40px,4.5vw,67px)] leading-[1.1] font-[650] tracking-[-3.6px] max-lg:text-[49px] max-lg:tracking-[-2.8px] max-sm:text-[clamp(39px,10.6vw,56px)] max-sm:leading-[1.13] max-sm:tracking-[-2.3px] short:text-5xl max-sm:short:text-4xl">{t.headline}<br className="hidden max-sm:block" /> <span className="relative inline-block text-brand dark:text-[#b58bff]">{t.headlineAccent}
           <svg className="pointer-events-none absolute -top-[18px] -right-[28px] size-[.5em] fill-none stroke-[#d6b21d] stroke-[2.5] [stroke-linecap:round]" viewBox="0 0 36 36" aria-hidden="true">
             <path d="M6 16V6 M15.8995 20.1005L22.9706 13.0294 M20 30H30" />
           </svg>
         </span></h1>
-        <p className="mx-auto mt-4 text-sm leading-[1.8] text-muted max-sm:max-w-[315px] max-sm:text-xs short:mt-2.5 short:text-[13px] max-sm:short:text-xs max-sm:short:leading-[1.6]">{t.intro}<br className="max-sm:hidden" /> {t.introNext}</p>
+        <p className="mx-auto mt-4 animate-appear text-sm leading-[1.8] text-muted [animation-delay:160ms] max-sm:max-w-[315px] max-sm:text-xs short:mt-2.5 short:text-[13px] max-sm:short:text-xs max-sm:short:leading-[1.6]">{t.intro}<br className="max-sm:hidden" /> {t.introNext}</p>
       </section>
 
       <section className="island-scene relative mx-auto h-full min-h-0 w-full max-w-[1000px] [container-type:size]" aria-label={t.islandLabel}>
@@ -134,13 +140,14 @@ export function Landing({ language }: { language: Language }) {
         <span className="absolute bottom-[19%] left-[13%] text-[26px] text-[#ae93d4] max-sm:bottom-[8%] max-sm:text-xl" aria-hidden="true">✧</span><span className="absolute right-[16%] bottom-[10%] text-[15px] text-[#d5bc50] max-sm:right-[12%] max-sm:bottom-[5%]" aria-hidden="true">✦</span>
       </section>
 
-      <section className="download-area relative z-2 animate-appear px-5 pt-2 pb-8 short:pb-5 text-center [animation-delay:200ms]" aria-label={t.downloadLabel}>
+      <section id="download" className="download-area relative z-2 scroll-mt-8 animate-appear px-5 pt-2 pb-8 short:pb-5 text-center [animation-delay:200ms]" aria-label={t.downloadLabel}>
         <p className="mb-4 text-[13px] font-[550] max-sm:mb-3 max-sm:text-xs short:mb-2.5">{t.freshStart}</p>
         <div className="flex flex-wrap justify-center gap-3 max-sm:gap-2">
           {(['macOS', 'Windows'] as const).map(platform => <button className={`flex min-w-48 items-center gap-3 rounded-xl border px-4 py-3 text-left transition duration-250 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 max-sm:min-w-[155px] max-sm:gap-2 max-sm:px-3 short:py-2 [&>svg:first-child]:size-[27px] ${platform === 'macOS' ? 'border-transparent bg-brand text-white shadow-brand/10 shadow-md' : 'border-line bg-card text-ink'}`} key={platform} disabled={!ready || downloading !== null} aria-busy={downloading === platform} onClick={() => void download(platform)} aria-describedby="download-note"><PlatformIcon platform={platform} /><span><small className="block text-[9px] leading-[1.4] opacity-75">{downloading === platform ? t.preparing : t.downloadFor}</small><strong className="block text-base leading-[1.4] font-semibold max-sm:text-sm">{platform}</strong></span><ArrowUpRight className="ml-auto opacity-65 max-sm:size-3.5" size={18} /></button>)}
         </div>
         <p id="download-note" className="mt-3 flex items-center justify-center gap-1.5 text-[10px] text-muted short:mt-2"><span className="size-[5px] rounded-full bg-[#a5ad97]" /> {t.downloadNote}</p>
-        <nav className="mt-6 flex items-center justify-center gap-3 short:mt-4" aria-label={language === 'th' ? 'โซเชียลมีเดีย' : 'Social media'}>
+        <nav className="mt-6 flex items-center justify-center gap-3 short:mt-4" aria-label={t.explore}>
+          <a href="#compare" className="mr-2 inline-flex min-h-10 items-center gap-2 border-r border-line pr-5 text-xs font-medium text-muted transition-colors hover:text-brand">{t.compare}<ArrowDown className="size-3.5" aria-hidden="true" /></a>
           <a href="https://www.facebook.com/HeyDay.Money.Club" target="_blank" rel="noopener noreferrer" aria-label="Heyday Money on Facebook" title="Facebook" className="grid size-10 place-items-center rounded-full border border-line bg-card text-muted transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
             <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.026 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.931-1.956 1.887v2.264h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073Z" /></svg>
           </a>
@@ -149,9 +156,12 @@ export function Landing({ language }: { language: Language }) {
           </a>
         </nav>
       </section>
+    </div>
+    </div>
+    <FeatureComparison language={language} />
     </main>
 
-    <footer className="site-footer relative mx-[4.4%] flex h-full items-center justify-between gap-5 border-t border-line text-[10px] text-muted max-sm:flex-col max-sm:justify-center max-sm:gap-1">
+    <footer className="site-footer relative mx-[4.4%] flex min-h-20 items-center justify-between gap-5 border-t border-line py-4 text-[10px] text-muted max-sm:min-h-[68px] max-sm:flex-col max-sm:justify-center max-sm:gap-1">
       <span className="text-[10px] max-sm:text-[9px]">{t.footer} <strong className="font-[550] text-ink">{t.footerAccent}</strong></span>
       <span className="absolute left-1/2 flex -translate-x-1/2 items-baseline gap-2 whitespace-nowrap text-[10px] max-lg:hidden"><strong className="font-serif text-[15px] text-ink">heyday</strong> <span>/ˈheɪdeɪ/</span> <em>{t.definition}</em></span>
       <div className="flex shrink-0 items-center gap-4 max-sm:gap-3">

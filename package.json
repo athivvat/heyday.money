@@ -4,25 +4,36 @@
   "type": "module",
   "packageManager": "bun@1.4.2",
   "scripts": {
+    "auth:migrate": "bun scripts/auth-migrate.ts",
+    "sync:access": "bun scripts/sync-access.ts",
+    "billing:reconcile": "bun scripts/billing-reconcile.ts",
+    "test:api": "bun test tests/api",
+    "test:postgres": "bun test tests/integration",
     "dev": "vite --host 127.0.0.1 --port 3000",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 3000",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "1.7.15",
     "@tanstack/react-router": "1.170.45",
     "@tanstack/react-start": "1.169.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/og": "0.8.5",
+    "better-auth": "1.7.15",
     "lucide-react": "latest",
     "nitro": "^3.0.260903-beta",
+    "pg": "8.23.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "resend": "6.37.0",
+    "stripe": "23.1.0"
   },
   "devDependencies": {
     "@playwright/test": "latest",
     "@tailwindcss/vite": "^4.1.0",
     "@types/node": "^22.0.0",
+    "@types/pg": "8.23.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.1.0",

@@ -10,12 +10,36 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ThRouteImport } from './routes/th'
 import { Route as ApiOgRouteImport } from './routes/api.og'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiBillingIndexRouteImport } from './routes/api/billing/index'
+import { Route as ApiBillingCheckoutRouteImport } from './routes/api/billing/checkout'
+import { Route as ApiBillingPortalRouteImport } from './routes/api/billing/portal'
+import { Route as ApiV1MeRouteImport } from './routes/api/v1/me'
+import { Route as ApiWebhooksBillingRouteImport } from './routes/api/webhooks/billing'
+import { Route as ApiV1DevicesIndexRouteImport } from './routes/api/v1/devices/index'
+import { Route as ApiV1DevicesDeviceIdRouteImport } from './routes/api/v1/devices/$deviceId'
+import { Route as ApiV1EncryptionKeysRouteImport } from './routes/api/v1/encryption/keys'
+import { Route as ApiV1SyncPullRouteImport } from './routes/api/v1/sync/pull'
+import { Route as ApiV1SyncPushRouteImport } from './routes/api/v1/sync/push'
+import { Route as ApiV1SyncSnapshotRouteImport } from './routes/api/v1/sync/snapshot'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ThRoute = ThRouteImport.update({
@@ -28,35 +52,203 @@ const ApiOgRoute = ApiOgRouteImport.update({
   path: '/api/og',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBillingIndexRoute = ApiBillingIndexRouteImport.update({
+  id: '/api/billing/',
+  path: '/api/billing/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBillingCheckoutRoute = ApiBillingCheckoutRouteImport.update({
+  id: '/api/billing/checkout',
+  path: '/api/billing/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBillingPortalRoute = ApiBillingPortalRouteImport.update({
+  id: '/api/billing/portal',
+  path: '/api/billing/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MeRoute = ApiV1MeRouteImport.update({
+  id: '/api/v1/me',
+  path: '/api/v1/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksBillingRoute = ApiWebhooksBillingRouteImport.update({
+  id: '/api/webhooks/billing',
+  path: '/api/webhooks/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1DevicesIndexRoute = ApiV1DevicesIndexRouteImport.update({
+  id: '/api/v1/devices/',
+  path: '/api/v1/devices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1DevicesDeviceIdRoute = ApiV1DevicesDeviceIdRouteImport.update({
+  id: '/api/v1/devices/$deviceId',
+  path: '/api/v1/devices/$deviceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1EncryptionKeysRoute = ApiV1EncryptionKeysRouteImport.update({
+  id: '/api/v1/encryption/keys',
+  path: '/api/v1/encryption/keys',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SyncPullRoute = ApiV1SyncPullRouteImport.update({
+  id: '/api/v1/sync/pull',
+  path: '/api/v1/sync/pull',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SyncPushRoute = ApiV1SyncPushRouteImport.update({
+  id: '/api/v1/sync/push',
+  path: '/api/v1/sync/push',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SyncSnapshotRoute = ApiV1SyncSnapshotRouteImport.update({
+  id: '/api/v1/sync/snapshot',
+  path: '/api/v1/sync/snapshot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/login': typeof LoginRoute
   '/th': typeof ThRoute
   '/api/og': typeof ApiOgRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/billing/checkout': typeof ApiBillingCheckoutRoute
+  '/api/billing/portal': typeof ApiBillingPortalRoute
+  '/api/v1/me': typeof ApiV1MeRoute
+  '/api/webhooks/billing': typeof ApiWebhooksBillingRoute
+  '/api/billing/': typeof ApiBillingIndexRoute
+  '/api/v1/devices/$deviceId': typeof ApiV1DevicesDeviceIdRoute
+  '/api/v1/encryption/keys': typeof ApiV1EncryptionKeysRoute
+  '/api/v1/sync/pull': typeof ApiV1SyncPullRoute
+  '/api/v1/sync/push': typeof ApiV1SyncPushRoute
+  '/api/v1/sync/snapshot': typeof ApiV1SyncSnapshotRoute
+  '/api/v1/devices/': typeof ApiV1DevicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/login': typeof LoginRoute
   '/th': typeof ThRoute
   '/api/og': typeof ApiOgRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/billing/checkout': typeof ApiBillingCheckoutRoute
+  '/api/billing/portal': typeof ApiBillingPortalRoute
+  '/api/v1/me': typeof ApiV1MeRoute
+  '/api/webhooks/billing': typeof ApiWebhooksBillingRoute
+  '/api/billing': typeof ApiBillingIndexRoute
+  '/api/v1/devices/$deviceId': typeof ApiV1DevicesDeviceIdRoute
+  '/api/v1/encryption/keys': typeof ApiV1EncryptionKeysRoute
+  '/api/v1/sync/pull': typeof ApiV1SyncPullRoute
+  '/api/v1/sync/push': typeof ApiV1SyncPushRoute
+  '/api/v1/sync/snapshot': typeof ApiV1SyncSnapshotRoute
+  '/api/v1/devices': typeof ApiV1DevicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/login': typeof LoginRoute
   '/th': typeof ThRoute
   '/api/og': typeof ApiOgRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/billing/checkout': typeof ApiBillingCheckoutRoute
+  '/api/billing/portal': typeof ApiBillingPortalRoute
+  '/api/v1/me': typeof ApiV1MeRoute
+  '/api/webhooks/billing': typeof ApiWebhooksBillingRoute
+  '/api/billing/': typeof ApiBillingIndexRoute
+  '/api/v1/devices/$deviceId': typeof ApiV1DevicesDeviceIdRoute
+  '/api/v1/encryption/keys': typeof ApiV1EncryptionKeysRoute
+  '/api/v1/sync/pull': typeof ApiV1SyncPullRoute
+  '/api/v1/sync/push': typeof ApiV1SyncPushRoute
+  '/api/v1/sync/snapshot': typeof ApiV1SyncSnapshotRoute
+  '/api/v1/devices/': typeof ApiV1DevicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/th' | '/api/og'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/login'
+    | '/th'
+    | '/api/og'
+    | '/api/auth/$'
+    | '/api/billing/checkout'
+    | '/api/billing/portal'
+    | '/api/v1/me'
+    | '/api/webhooks/billing'
+    | '/api/billing/'
+    | '/api/v1/devices/$deviceId'
+    | '/api/v1/encryption/keys'
+    | '/api/v1/sync/pull'
+    | '/api/v1/sync/push'
+    | '/api/v1/sync/snapshot'
+    | '/api/v1/devices/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/th' | '/api/og'
-  id: '__root__' | '/' | '/th' | '/api/og'
+  to:
+    | '/'
+    | '/account'
+    | '/login'
+    | '/th'
+    | '/api/og'
+    | '/api/auth/$'
+    | '/api/billing/checkout'
+    | '/api/billing/portal'
+    | '/api/v1/me'
+    | '/api/webhooks/billing'
+    | '/api/billing'
+    | '/api/v1/devices/$deviceId'
+    | '/api/v1/encryption/keys'
+    | '/api/v1/sync/pull'
+    | '/api/v1/sync/push'
+    | '/api/v1/sync/snapshot'
+    | '/api/v1/devices'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/login'
+    | '/th'
+    | '/api/og'
+    | '/api/auth/$'
+    | '/api/billing/checkout'
+    | '/api/billing/portal'
+    | '/api/v1/me'
+    | '/api/webhooks/billing'
+    | '/api/billing/'
+    | '/api/v1/devices/$deviceId'
+    | '/api/v1/encryption/keys'
+    | '/api/v1/sync/pull'
+    | '/api/v1/sync/push'
+    | '/api/v1/sync/snapshot'
+    | '/api/v1/devices/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  LoginRoute: typeof LoginRoute
   ThRoute: typeof ThRoute
   ApiOgRoute: typeof ApiOgRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiBillingCheckoutRoute: typeof ApiBillingCheckoutRoute
+  ApiBillingPortalRoute: typeof ApiBillingPortalRoute
+  ApiV1MeRoute: typeof ApiV1MeRoute
+  ApiWebhooksBillingRoute: typeof ApiWebhooksBillingRoute
+  ApiBillingIndexRoute: typeof ApiBillingIndexRoute
+  ApiV1DevicesDeviceIdRoute: typeof ApiV1DevicesDeviceIdRoute
+  ApiV1EncryptionKeysRoute: typeof ApiV1EncryptionKeysRoute
+  ApiV1SyncPullRoute: typeof ApiV1SyncPullRoute
+  ApiV1SyncPushRoute: typeof ApiV1SyncPushRoute
+  ApiV1SyncSnapshotRoute: typeof ApiV1SyncSnapshotRoute
+  ApiV1DevicesIndexRoute: typeof ApiV1DevicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +258,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/th': {
@@ -82,13 +288,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/billing/': {
+      id: '/api/billing/'
+      path: '/api/billing'
+      fullPath: '/api/billing/'
+      preLoaderRoute: typeof ApiBillingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/billing/checkout': {
+      id: '/api/billing/checkout'
+      path: '/api/billing/checkout'
+      fullPath: '/api/billing/checkout'
+      preLoaderRoute: typeof ApiBillingCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/billing/portal': {
+      id: '/api/billing/portal'
+      path: '/api/billing/portal'
+      fullPath: '/api/billing/portal'
+      preLoaderRoute: typeof ApiBillingPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/me': {
+      id: '/api/v1/me'
+      path: '/api/v1/me'
+      fullPath: '/api/v1/me'
+      preLoaderRoute: typeof ApiV1MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/billing': {
+      id: '/api/webhooks/billing'
+      path: '/api/webhooks/billing'
+      fullPath: '/api/webhooks/billing'
+      preLoaderRoute: typeof ApiWebhooksBillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/devices/': {
+      id: '/api/v1/devices/'
+      path: '/api/v1/devices'
+      fullPath: '/api/v1/devices/'
+      preLoaderRoute: typeof ApiV1DevicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/devices/$deviceId': {
+      id: '/api/v1/devices/$deviceId'
+      path: '/api/v1/devices/$deviceId'
+      fullPath: '/api/v1/devices/$deviceId'
+      preLoaderRoute: typeof ApiV1DevicesDeviceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/encryption/keys': {
+      id: '/api/v1/encryption/keys'
+      path: '/api/v1/encryption/keys'
+      fullPath: '/api/v1/encryption/keys'
+      preLoaderRoute: typeof ApiV1EncryptionKeysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/sync/pull': {
+      id: '/api/v1/sync/pull'
+      path: '/api/v1/sync/pull'
+      fullPath: '/api/v1/sync/pull'
+      preLoaderRoute: typeof ApiV1SyncPullRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/sync/push': {
+      id: '/api/v1/sync/push'
+      path: '/api/v1/sync/push'
+      fullPath: '/api/v1/sync/push'
+      preLoaderRoute: typeof ApiV1SyncPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/sync/snapshot': {
+      id: '/api/v1/sync/snapshot'
+      path: '/api/v1/sync/snapshot'
+      fullPath: '/api/v1/sync/snapshot'
+      preLoaderRoute: typeof ApiV1SyncSnapshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  LoginRoute: LoginRoute,
   ThRoute: ThRoute,
   ApiOgRoute: ApiOgRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiBillingCheckoutRoute: ApiBillingCheckoutRoute,
+  ApiBillingPortalRoute: ApiBillingPortalRoute,
+  ApiV1MeRoute: ApiV1MeRoute,
+  ApiWebhooksBillingRoute: ApiWebhooksBillingRoute,
+  ApiBillingIndexRoute: ApiBillingIndexRoute,
+  ApiV1DevicesDeviceIdRoute: ApiV1DevicesDeviceIdRoute,
+  ApiV1EncryptionKeysRoute: ApiV1EncryptionKeysRoute,
+  ApiV1SyncPullRoute: ApiV1SyncPullRoute,
+  ApiV1SyncPushRoute: ApiV1SyncPushRoute,
+  ApiV1SyncSnapshotRoute: ApiV1SyncSnapshotRoute,
+  ApiV1DevicesIndexRoute: ApiV1DevicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -6,5 +6,7 @@ Heyday.Money helps you take back control of your finances. It gives you a clear 
 
 ---
 
+For local PostgreSQL and the API service, see the [Docker Compose setup](docs/development.md#docker-compose).
+
 **Note:**
 `Heyday(noun)/ˈheɪdeɪ/:` The time when somebody/something had most power or success, or was most popular
