@@ -28,7 +28,7 @@ The app keeps the pending replacement available for retry or cancellation. Cance
 checks the server first; a request that actually committed is acknowledged rather
 than undone. A new prepared key expires from native memory after ten minutes.
 
-**Verify another device** downloads and checks encrypted history against this
+**Get verification code** downloads and checks encrypted history against this
 device's saved checkpoint, then displays an `HDV1` code. Transfer that code directly
 to the new device and enter it with the recovery key. It binds the service origin,
 account, dataset, current key package and verified history checkpoint. It contains

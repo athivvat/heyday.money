@@ -3,7 +3,7 @@ import { getMigrations } from 'better-auth/db/migration'
 import { authConfig } from '../src/server/auth/config'
 import { authOptions } from '../src/server/auth/options'
 import { betterAuth } from 'better-auth'
-import { seedDesktopClient } from '../src/server/auth/desktop-client'
+import { seedDesktopClient, seedMobileClient } from '../src/server/auth/desktop-client'
 import { migrateCloud } from '../src/server/db/migrate'
 
 let pool: Pool | undefined
@@ -17,6 +17,7 @@ try {
   if (process.argv.includes('--apply')) {
     await migration.runMigrations()
     await seedDesktopClient((await betterAuth(options).$context).adapter)
+    await seedMobileClient((await betterAuth(options).$context).adapter)
     await migrateCloud(pool, true)
     console.log('Authentication and cloud account/device/encryption/sync migrations applied.')
   } else {

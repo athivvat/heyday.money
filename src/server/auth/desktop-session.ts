@@ -1,7 +1,7 @@
 import type { BetterAuthOptions, Session } from 'better-auth'
 import { APIError } from 'better-auth/api'
 import type { VerificationValue } from '@better-auth/oauth-provider'
-import { DESKTOP_CLIENT_ID } from './desktop-client'
+import { isNativeClient } from './desktop-client'
 
 /**
  * Give each native authorization its own session before the provider mints tokens.
@@ -15,7 +15,7 @@ export const desktopSessionHooks = {
       before: async (verification, ctx) => {
         let grant: Partial<VerificationValue> | null
         try { grant = JSON.parse(verification.value) } catch { return }
-        if (grant?.type !== 'authorization_code' || grant.query?.client_id !== DESKTOP_CLIENT_ID) return
+        if (grant?.type !== 'authorization_code' || !isNativeClient(grant.query?.client_id)) return
 
         const authenticated = ctx?.context.session
         if (!ctx || !authenticated || typeof grant.sessionId !== 'string' || typeof grant.userId !== 'string' ||

@@ -53,6 +53,32 @@ and the port in `BETTER_AUTH_URL`. The services are:
 - `service`: the compiled TanStack Start/Nitro website and API, running as a
   non-root user on Node.js. Its health check verifies HTTP service availability.
 
+To open the website from another computer on the same network, set
+`APP_BIND_ADDRESS=0.0.0.0` in `.env.compose`, then recreate only the service:
+
+```sh
+docker compose --env-file .env.compose up -d --no-deps service
+```
+
+Browse to `http://<server-LAN-IP>:3000`. The default bind address remains
+`127.0.0.1`; this setting changes only the web service's published interface.
+It does not change the auth origin. LAN HTTP sign-in/sync is not supported by the
+current auth or native-origin validators, even when the homepage is reachable.
+
+For two-device development using the existing HTTP localhost account/database,
+forward port 3000 over SSH from the second computer. SSH access must already be
+enabled on the server computer. Replace the username and LAN address:
+
+```sh
+ssh -o ExitOnForwardFailure=yes -N -L 127.0.0.1:3000:127.0.0.1:3000 YOUR_USERNAME@192.168.1.143
+```
+
+Keep the tunnel running and use `http://localhost:3000` on both computers. Build
+the native app on each with `HEYDAY_API_URL=http://localhost:3000` and run
+`bun run desktop:dev`. An SSH tunnel works with the default localhost-only Docker
+binding too. For packaged/release testing, use a shared HTTPS service and set both
+`BETTER_AUTH_URL` and the apps' compile-time `HEYDAY_API_URL` to that same origin.
+
 To connect with TablePlus, DBeaver or another database client, use host
 `127.0.0.1`, port `5432` (or `POSTGRES_PORT`), database `heyday`, user `heyday`,
 and the existing `POSTGRES_PASSWORD` from your local `.env.compose`. The port is

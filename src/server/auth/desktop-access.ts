@@ -1,6 +1,6 @@
 import { createAuthEndpoint, APIError } from 'better-auth/api'
 import { getOAuthProviderApi, type OAuthOptions } from '@better-auth/oauth-provider'
-import { DESKTOP_CLIENT_ID } from './desktop-client'
+import { isNativeClient } from './desktop-client'
 
 /** Server-only provider verification: no HTTP endpoint and no hand-decoded tokens. */
 export function desktopAccess(options: OAuthOptions<string[]>) {
@@ -12,10 +12,10 @@ export function desktopAccess(options: OAuthOptions<string[]>) {
       }, async ctx => {
         const token = ctx.body?.token
         if (typeof token !== 'string' || token.length > 8192 || !token) throw new APIError('UNAUTHORIZED')
-        const claims = await getOAuthProviderApi(ctx, options).requireActiveAccessToken(token, DESKTOP_CLIENT_ID)
+        const claims = await getOAuthProviderApi(ctx, options).requireActiveAccessToken(token)
         // This first-party API accepts only our session-bound native client's opaque
         // access tokens. Resource-bound JWTs/ID tokens and DPoP are not supported here.
-        if (token.includes('.') || claims.client_id !== DESKTOP_CLIENT_ID ||
+        if (token.includes('.') || !isNativeClient(claims.client_id) ||
             claims.iss !== ctx.context.baseURL || claims.aud !== undefined || claims.cnf ||
             typeof claims.sub !== 'string' || typeof claims.sid !== 'string' ||
             typeof claims.exp !== 'number' || claims.exp <= Date.now() / 1000 ||

@@ -6,7 +6,7 @@ import { Pool } from 'pg'
 import { betterAuth } from 'better-auth'
 import { getMigrations } from 'better-auth/db/migration'
 import { authOptions } from '../../src/server/auth/options'
-import { seedDesktopClient, DESKTOP_CLIENT_ID } from '../../src/server/auth/desktop-client'
+import { seedDesktopClient, seedMobileClient, DESKTOP_CLIENT_ID, MOBILE_CLIENT_ID } from '../../src/server/auth/desktop-client'
 import { migrateCloud } from '../../src/server/db/migrate'
 import { DeviceService } from '../../src/server/devices/service'
 import { deviceHandler } from '../../src/server/devices/handler'
@@ -28,19 +28,20 @@ test('PostgreSQL account/device ownership, concurrent registration, session bind
     await (await getMigrations(options)).runMigrations()
     const auth = betterAuth(options)
     await seedDesktopClient((await auth.$context).adapter)
+    await seedMobileClient((await auth.$context).adapter)
     await migrateCloud(pool, true)
     await migrateCloud(pool, true)
-    assert.equal((await pool.query('SELECT count(*) FROM cloud_migrations')).rows[0].count, '9')
+    assert.equal((await pool.query('SELECT count(*) FROM cloud_migrations')).rows[0].count, '10')
     const service = new DeviceService(pool)
     const handle = deviceHandler(service, input => auth.api.verifyDesktopAccess(input))
     const tokenRequest = (values: Record<string, string>) => auth.handler(new Request(`${origin}/api/auth/oauth2/token`, {
       method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: DESKTOP_CLIENT_ID, ...values }),
     }))
-    async function login(email: string) {
+    async function login(email: string, clientId = DESKTOP_CLIENT_ID) {
       const verifier = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url')
       const challenge = Buffer.from(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))).toString('base64url')
-      const redirect = 'http://127.0.0.1:54321/callback'
-      const query = new URLSearchParams({ client_id: DESKTOP_CLIENT_ID, redirect_uri: redirect, response_type: 'code', scope: 'openid email offline_access', code_challenge: challenge, code_challenge_method: 'S256', state: randomUUID(), prompt: 'login' })
+      const redirect = clientId === MOBILE_CLIENT_ID ? 'money.heyday.mobile:/oauth/callback' : 'http://127.0.0.1:54321/callback'
+      const query = new URLSearchParams({ client_id: clientId, redirect_uri: redirect, response_type: 'code', scope: 'openid email offline_access', code_challenge: challenge, code_challenge_method: 'S256', state: randomUUID(), prompt: 'login' })
       const authorize = await auth.handler(new Request(`${origin}/api/auth/oauth2/authorize?${query}`))
       const loginUrl = new URL(authorize.headers.get('location')!, origin)
       const post = (path: string, body: unknown) => auth.handler(new Request(`${origin}/api/auth${path}`, { method: 'POST', headers: { 'content-type': 'application/json', origin }, body: JSON.stringify(body) }))
@@ -48,7 +49,7 @@ test('PostgreSQL account/device ownership, concurrent registration, session bind
       const signedIn = await post('/sign-in/email-otp', { email, otp: codes.get(email), oauth_query: loginUrl.search.slice(1) })
       assert.equal(signedIn.status, 200)
       const callback = new URL((await signedIn.json()).url)
-      const response = await tokenRequest({ grant_type: 'authorization_code', code: callback.searchParams.get('code')!, code_verifier: verifier, redirect_uri: redirect })
+      const response = await tokenRequest({ client_id: clientId, grant_type: 'authorization_code', code: callback.searchParams.get('code')!, code_verifier: verifier, redirect_uri: redirect })
       assert.equal(response.status, 200)
       const tokens = await response.json() as { access_token: string; refresh_token: string; id_token: string }
       return { ...tokens, cookie: signedIn.headers.getSetCookie().map(value => value.split(';')[0]).join('; ') }
@@ -61,6 +62,13 @@ test('PostgreSQL account/device ownership, concurrent registration, session bind
       headers: { ...(token ? { authorization: `Bearer ${token}` } : {}), ...(body === undefined ? {} : { 'content-type': 'application/json' }) },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     }), action, id)
+    const phone = await login('phone@example.test', MOBILE_CLIENT_ID)
+    for (const platform of ['ios', 'android']) {
+      const session = platform === 'ios' ? phone : await login('phone@example.test', MOBILE_CLIENT_ID)
+      const response = await call(session.access_token, 'register', { installationId: randomUUID(), name: platform + ' phone', platform })
+      assert.equal(response.status, 200)
+      assert.equal((await response.json()).platform, platform)
+    }
     assert.equal((await call(null, 'me')).status, 401)
     assert.equal((await call('not-a-token', 'me')).status, 401)
     assert.equal((await call(alice.id_token, 'me')).status, 401)

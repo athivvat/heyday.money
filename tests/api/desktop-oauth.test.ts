@@ -4,9 +4,9 @@ import { Database } from 'bun:sqlite'
 import { betterAuth } from 'better-auth'
 import { getMigrations } from 'better-auth/db/migration'
 import { authOptions } from '../../src/server/auth/options'
-import { seedDesktopClient, DESKTOP_CLIENT_ID } from '../../src/server/auth/desktop-client'
+import { seedDesktopClient, seedMobileClient, DESKTOP_CLIENT_ID, MOBILE_CLIENT_ID } from '../../src/server/auth/desktop-client'
 
-test('email beta completes native PKCE, refresh and revocation with no social login', async () => {
+for (const clientId of [DESKTOP_CLIENT_ID, MOBILE_CLIENT_ID]) test(`${clientId} completes native PKCE, refresh and revocation with no social login`, async () => {
   const db = new Database(':memory:')
   const origin = 'http://localhost:3000'
   let otp = ''
@@ -15,18 +15,23 @@ test('email beta completes native PKCE, refresh and revocation with no social lo
     await (await getMigrations(options)).runMigrations()
     const auth = betterAuth(options)
     await seedDesktopClient((await auth.$context).adapter)
-    await seedDesktopClient((await auth.$context).adapter)
+    await seedMobileClient((await auth.$context).adapter)
+    await seedMobileClient((await auth.$context).adapter)
     const post = (path: string, body: unknown, cookie = '') => auth.handler(new Request(`${origin}/api/auth${path}`, { method: 'POST', headers: { 'content-type': 'application/json', origin, cookie }, body: JSON.stringify(body) }))
     assert.equal((await post('/sign-in/social', { provider: 'google' })).status, 404)
     assert.equal((await post('/sign-in/social', { provider: 'apple' })).status, 404)
     const verifier = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64url')
     const challenge = Buffer.from(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))).toString('base64url')
-    const redirect = 'http://127.0.0.1:54321/callback'
-    const params = new URLSearchParams({ client_id: DESKTOP_CLIENT_ID, redirect_uri: redirect, response_type: 'code', scope: 'openid email offline_access', code_challenge: challenge, code_challenge_method: 'S256', state: 'test-random-state', prompt: 'login' })
+    const redirect = clientId === DESKTOP_CLIENT_ID ? 'http://127.0.0.1:54321/callback' : 'money.heyday.mobile:/oauth/callback'
+    const params = new URLSearchParams({ client_id: clientId, redirect_uri: redirect, response_type: 'code', scope: 'openid email offline_access', code_challenge: challenge, code_challenge_method: 'S256', state: 'test-random-state', prompt: 'login' })
     const missingPkce = new URLSearchParams(params)
     missingPkce.delete('code_challenge'); missingPkce.delete('code_challenge_method')
     const rejected = await auth.handler(new Request(`${origin}/api/auth/oauth2/authorize?${missingPkce}`))
     assert.equal(new URL(rejected.headers.get('location')!, origin).searchParams.get('error'), 'invalid_request')
+    const wrongRedirect = new URLSearchParams(params)
+    wrongRedirect.set('redirect_uri', 'money.heyday.mobile:/wrong')
+    const invalidRedirect = await auth.handler(new Request(`${origin}/api/auth/oauth2/authorize?${wrongRedirect}`))
+    assert.ok(invalidRedirect.status >= 400 || !invalidRedirect.headers.get('location')?.startsWith('money.heyday.mobile:'))
     const authorize = await auth.handler(new Request(`${origin}/api/auth/oauth2/authorize?${params}`))
     assert.equal(authorize.status, 302)
     const login = new URL(authorize.headers.get('location')!, origin)
@@ -38,10 +43,10 @@ test('email beta completes native PKCE, refresh and revocation with no social lo
     const result = await signedIn.json()
     assert.equal(result.redirect, true)
     const callback = new URL(result.url)
-    assert.equal(callback.origin + callback.pathname, redirect)
+    assert.equal(callback.href.split('?')[0], redirect)
     assert.equal(callback.searchParams.get('state'), 'test-random-state')
     assert.equal(callback.searchParams.get('iss'), `${origin}/api/auth`)
-    const tokenRequest = (values: Record<string, string>) => auth.handler(new Request(`${origin}/api/auth/oauth2/token`, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: DESKTOP_CLIENT_ID, ...values }) }))
+    const tokenRequest = (values: Record<string, string>) => auth.handler(new Request(`${origin}/api/auth/oauth2/token`, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: clientId, ...values }) }))
     const exchange = { grant_type: 'authorization_code', code: callback.searchParams.get('code')!, code_verifier: verifier, redirect_uri: redirect }
     const tokens = await tokenRequest(exchange)
     assert.equal(tokens.status, 200)
@@ -77,7 +82,7 @@ test('email beta completes native PKCE, refresh and revocation with no social lo
     assert.notEqual(otherDesktop.sessionId, web.session.id)
     // Desktop sign-out revokes both native credentials, without signing out the website/other app.
     for (const [hint, value] of [['refresh_token', second.refresh_token], ['access_token', second.access_token]]) {
-      const revoke = await auth.handler(new Request(`${origin}/api/auth/oauth2/revoke`, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: DESKTOP_CLIENT_ID, token: value, token_type_hint: hint }) }))
+      const revoke = await auth.handler(new Request(`${origin}/api/auth/oauth2/revoke`, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: clientId, token: value, token_type_hint: hint }) }))
       // The provider cascades refresh revocation to access tokens; the second
       // call can report that the access token is already invalid.
       if (hint === 'access_token' && revoke.status === 400) assert.equal((await revoke.json()).error, 'invalid_request')

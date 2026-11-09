@@ -54,7 +54,7 @@ function Login() {
     <section className="mx-auto max-w-md rounded-3xl border border-purple-200 bg-white p-8 shadow-sm dark:border-purple-900 dark:bg-[#241d2e]">
       <Link to="/" className="font-semibold text-purple-600 dark:text-purple-300">Heyday Money</Link>
       <h1 className="mt-8 text-3xl font-semibold">{done ? 'You’re signed in' : 'Sign in to Heyday'}</h1>
-      {done ? <div className="mt-4"><p>Return to the desktop app to continue. You can close this tab.</p><a href="/account" className="mt-4 inline-block underline">Manage your subscription</a></div> : <>
+      {done ? <div className="mt-4"><p>Return to the Heyday app to continue. You can close this tab.</p><a href="/account" className="mt-4 inline-block underline">Manage your subscription</a></div> : <>
         <p className="mt-3 text-sm leading-6">Beta sign-in uses a code sent to your email. No password needed.</p>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <label className="block text-sm font-medium" htmlFor="email">Email address</label>

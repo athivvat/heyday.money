@@ -1,7 +1,7 @@
 import { exactFields, object, ValidationError } from './common'
 import type { BillingSummary } from './billing'
 
-export interface DeviceRegistration { installationId: string; name: string; platform: 'macos' | 'windows' | 'linux' }
+export interface DeviceRegistration { installationId: string; name: string; platform: 'macos' | 'windows' | 'linux' | 'ios' | 'android' }
 export interface Device { id: string; name: string; platform: DeviceRegistration['platform']; createdAt: string; lastSeenAt: string; revokedAt: string | null; current: boolean }
 export interface DevicePage { devices: Device[]; nextCursor: string | null }
 export interface AccountInfo {
@@ -28,7 +28,7 @@ export function deviceRegistration(value: unknown): DeviceRegistration {
   if (typeof body.name !== 'string' || !body.name.trim() || body.name.trim().length > 80 || /[\u0000-\u001f\u007f]/.test(body.name)) {
     throw new ValidationError('name', 'Expected a device name of 1–80 characters without control characters.')
   }
-  if (body.platform !== 'macos' && body.platform !== 'windows' && body.platform !== 'linux') throw new ValidationError('platform', 'Unsupported desktop platform.')
+  if (body.platform !== 'macos' && body.platform !== 'windows' && body.platform !== 'linux' && body.platform !== 'ios' && body.platform !== 'android') throw new ValidationError('platform', 'Unsupported device platform.')
   return { installationId, name: body.name.trim(), platform: body.platform }
 }
 
